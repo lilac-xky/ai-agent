@@ -18,12 +18,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class LoveAPP {
+public class LoveApp {
 
     @Resource
     private VectorStore loveAppVectorStore;
     @Resource
     private Advisor loveAppRagCloudAdvisor;
+    @Resource
+    private VectorStore pgVectorVectorStore;
 
     private final ChatClient chatClient;
 
@@ -32,7 +34,7 @@ public class LoveAPP {
             "恋爱状态询问沟通、习惯差异引发的矛盾；已婚状态询问家庭责任与亲属关系处理的问题。" +
             "引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。";
 
-    public LoveAPP(ChatClient.Builder builder){
+    public LoveApp(ChatClient.Builder builder){
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(1).build();
         this.chatClient = builder
                 .defaultSystem(SYSTEM_PROMPT)
@@ -74,6 +76,8 @@ public class LoveAPP {
                 .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())
                 // 云端RAG
 //                .advisors(loveAppRagCloudAdvisor)
+                // pgvector RAG
+//                .advisors(QuestionAnswerAdvisor.builder(pgVectorVectorStore).build())
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

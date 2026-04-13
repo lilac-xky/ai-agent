@@ -8,10 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.UUID;
 
 @SpringBootTest
-class LoveAPPTest {
+class LoveAppTest {
 
     @Resource
-    private LoveAPP loveApp;
+    private LoveApp loveApp;
 
     @Test
     void doChat() {
