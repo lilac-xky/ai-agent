@@ -10,17 +10,25 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * 配置向量库
+ */
 @Configuration
 public class LoveAppVectorStoreConfig {
 
     @Resource
     private LoveAppDocumentLoader loveAppDocumentLoader;
+    @Resource
+    private MyKeywordEnricher myKeywordEnricher;
 
     @Bean
     VectorStore loveAppVectorStore(EmbeddingModel dashscopeEmbeddingModel) {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
         List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
-        simpleVectorStore.add(documents);
+        // 添加关键词
+        List<Document> enrichDocuments = myKeywordEnricher.enrichDocuments(documents);
+        simpleVectorStore.add(enrichDocuments);
+
         return simpleVectorStore;
     }
 }
