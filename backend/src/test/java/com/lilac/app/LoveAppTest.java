@@ -35,4 +35,13 @@ class LoveAppTest {
         String answer = loveApp.doChatWithRAG(message, chatId);
         Assertions.assertNotNull(answer);
     }
+
+    @Test
+    void doChatWithMcp() {
+        String chatId = UUID.randomUUID().toString();
+        String message = "帮我搜索一些可爱的图片";
+        String answer =  loveApp.doChatWithMCP(message, chatId);
+        Assertions.assertNotNull(answer);
+    }
+
 }

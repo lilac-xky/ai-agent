@@ -12,6 +12,7 @@ import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvi
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,8 @@ public class LoveApp {
     private Advisor loveAppRagCloudAdvisor;
     @Resource
     private VectorStore pgVectorVectorStore;
+    @Resource
+    ToolCallbackProvider toolCallbackProvider;
 
     private final ChatClient chatClient;
 
@@ -42,7 +45,7 @@ public class LoveApp {
     public LoveApp(ChatClient.Builder builder){
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(1).build();
         this.chatClient = builder
-                .defaultSystem(SYSTEM_PROMPT)
+//                .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(chatMemory).build()
 //                        new MyLoggerAdvisor()
@@ -89,6 +92,25 @@ public class LoveApp {
 //                .advisors(LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(loveAppVectorStore, "已婚"))
                 // 最佳pgRAG
 //                .advisors(LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(pgVectorVectorStore, "已婚"))
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("回答：{}", content);
+        return content;
+    }
+
+    /**
+     * 聊天MCP
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public String doChatWithMCP(String message, String chatId){
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(new MyLoggerAdvisor())
+                .toolCallbacks(toolCallbackProvider)
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

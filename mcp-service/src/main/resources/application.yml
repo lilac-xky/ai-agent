@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: lilac-agent-mcp
+  profiles:
+    active: dev
+server:
+  port: 9191
